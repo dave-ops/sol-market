@@ -1,5 +1,20 @@
 # sol-market
 
+## folder structure
+```
+sol-market/
+├── src/
+│   ├── models/
+│   │   └── marketplace_item.rs
+│   ├── repositories/
+│   │   └── marketplace_item_repository.rs
+│   └── lib.rs
+├── Cargo.toml
+├── .gitignore
+├── LICENSE
+└── README.md
+```
+
 ## install
 ```bash
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
@@ -9,6 +24,7 @@ LATEST_VERSION=$(curl -s https://api.github.com/repos/anza-xyz/agave/releases/la
 
 ## build
 ```bash
+cargo clean
 cargo build-sbf
 ```
 
@@ -16,3 +32,4 @@ cargo build-sbf
 ```bash
 solana program deploy target/deploy/solana_marketplace.so
 ```
+
