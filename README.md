@@ -38,6 +38,23 @@ tmux new-session -d -s solana_session 'solana-test-validator'
 solana program deploy target/deploy/solana_marketplace.so
 ```
 
+## attach to local validator
+```
+solana config set --url http://127.0.0.1:8899
+```
+
+## tmux
+1. **attach to session**
+```
+tmux attach -t solana_session
+```
+
+2. **detach**
+```
+Ctrl-B
+D
+```
+
 ## why src/lib.rs and Not src/main.rs?
 - entrypoint!(process_instruction);: This macro defines the entry point for a Solana program, not a traditional main function. Solana programs are libraries that the Solana runtime calls into via the defined entrypoint (process_instruction in this case).
 - No main Function: Unlike a binary project (main.rs), this code doesn’t run as a standalone application on your machine. It’s compiled into a BPF (Berkeley Packet Filter) binary and deployed to the Solana blockchain.
