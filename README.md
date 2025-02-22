@@ -63,9 +63,8 @@ source program_id.env
 ## run test
 ```
 cd test
-nvm install 20
-nvm use 20
-npm install
+source program_id.env
+node test.js
 ```
 
 
