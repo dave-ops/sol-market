@@ -8,8 +8,18 @@ use solana_program::{
     system_instruction,
 };
 
-use crate::models::marketplace_item::MarketplaceItem;
-use crate::repositories::marketplace_item_repository::{buy_item, list_item};
+// Declare the modules for models and repositories
+mod models {
+    pub mod marketplace_item;
+}
+
+mod repositories {
+    pub mod marketplace_item_repository;
+}
+
+// Use the modules
+use models::marketplace_item::MarketplaceItem;
+use repositories::marketplace_item_repository::{buy_item, list_item};
 
 entrypoint!(process_instruction);
 
