@@ -51,6 +51,8 @@ solana program show --programs
 ## fund account
 ```
 solana balance HhV9DkMHyRBUWDh1fSr771jqNEr9qYCB1ZvbBaUpJZ7q --url http://127.0.0.1:8899
+solana airdrop 5 9U79odCo6xaTTGD3cNLrxq5qELyfPZhtmJGa1SGE3ZLP --url http://127.0.0.1:8899
+solana airdrop 2 22xmAif9t3aLUNU3h1u8iHV7noVeGHqSWToZ29kSmT2U --url http://127.0.0.1:8899
 ```
 
 ## set program id
@@ -69,7 +71,7 @@ source program_id.env
 ```
 cd test
 source program_id.env
-node test.js
+node testg.js 9U79odCo6xaTTGD3cNLrxq5qELyfPZhtmJGa1SGE3ZLP 22xmAif9t3aLUNU3h1u8iHV7noVeGHqSWToZ29kSmT2U
 ```
 
 
