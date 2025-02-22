@@ -1,4 +1,4 @@
-const { Connection, Keypair, PublicKey, Transaction, SystemProgram, sendAndConfirmTransaction, LAMPORTS_PER_SOL, getMinimumBalanceForRentExemption } = require('@solana/web3.js');
+const { Connection, Keypair, PublicKey, Transaction, SystemProgram, sendAndConfirmTransaction, LAMPORTS_PER_SOL } = require('@solana/web3.js');
 
 async function main() {
     try {
@@ -6,11 +6,10 @@ async function main() {
         
         const payer = Keypair.generate();
         const seller = Keypair.generate();
-        // Don't generate itemAccount as a Keypair - program will create it
-        const itemAccount = Keypair.generate(); // Still need keypair for signing creation
+        const itemAccount = Keypair.generate();
 
         console.log("Requesting airdrops...");
-        const rentExemption = await getMinimumBalanceForRentExemption(73); // MarketplaceItem::LEN
+        const rentExemption = await connection.getMinimumBalanceForRentExemption(73); // MarketplaceItem::LEN
         const payerAirdropSig = await connection.requestAirdrop(payer.publicKey, 2 * LAMPORTS_PER_SOL + rentExemption);
         const sellerAirdropSig = await connection.requestAirdrop(seller.publicKey, 2 * LAMPORTS_PER_SOL);
         await Promise.all([
@@ -30,7 +29,7 @@ async function main() {
             programId,
             keys: [
                 { pubkey: payer.publicKey, isSigner: true, isWritable: true },
-                { pubkey: itemAccount.publicKey, isSigner: true, isWritable: true }, // Needs to be signer for create_account
+                { pubkey: itemAccount.publicKey, isSigner: true, isWritable: true },
                 { pubkey: SystemProgram.programId, isSigner: false, isWritable: false }
             ],
             data: listInstructionData
