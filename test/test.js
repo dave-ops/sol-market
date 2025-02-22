@@ -14,8 +14,8 @@ async function main() {
     await connection.requestAirdrop(seller.publicKey, 2e9); // 2 SOL
     await new Promise(resolve => setTimeout(resolve, 1000)); // Wait for airdrop confirmation
 
-    // Replace with your deployed Program ID
-    const programId = new PublicKey('<YourProgramPubkey>');
+    // Use environment variable for Program ID
+    const programId = new PublicKey(process.env.SOLANA_PROGRAM_ID);
 
     // Instruction 0: List an item (price = 1 SOL = 1e9 lamports)
     const listInstructionData = Buffer.concat([

@@ -43,6 +43,26 @@ solana program deploy target/deploy/solana_marketplace.so
 solana config set --url http://127.0.0.1:8899
 ```
 
+## get program id
+```
+solana program show --programs
+```
+
+## set program id
+```
+chmod +x set_program_id.sh
+./set_program_id.sh
+```
+
+## run test
+```
+cd test
+nvm install 20
+nvm use 20
+npm install
+```
+
+
 ## tmux
 1. **attach to session**
 ```
