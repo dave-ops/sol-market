@@ -2,13 +2,10 @@ use solana_program::{
     account_info::{next_account_info, AccountInfo},
     entrypoint,
     entrypoint::ProgramResult,
-    msg,
     program_error::ProgramError,
     pubkey::Pubkey,
-    system_instruction,
 };
 
-// Declare the modules for models and repositories
 mod models {
     pub mod marketplace_item;
 }
@@ -17,7 +14,6 @@ mod repositories {
     pub mod marketplace_item_repository;
 }
 
-// Use the modules
 use models::marketplace_item::MarketplaceItem;
 use repositories::marketplace_item_repository::{buy_item, list_item};
 
