@@ -4,15 +4,18 @@ async function main() {
     try {
         const connection = new Connection('http://127.0.0.1:8899', 'confirmed');
         
-        const payer = Keypair.generate(); // This will be both payer and seller
+        const payer = Keypair.generate(); // Payer and seller
         const itemAccount = Keypair.generate();
 
         console.log("Requesting airdrops...");
         const rentExemption = await connection.getMinimumBalanceForRentExemption(73); // MarketplaceItem::LEN
+        console.log("Rent exemption required:", rentExemption, "lamports");
+        
+        // Airdrop enough funds to payer to cover rent exemption and transaction fees
         const payerAirdropSig = await connection.requestAirdrop(payer.publicKey, 2 * LAMPORTS_PER_SOL + rentExemption);
         await connection.confirmTransaction(payerAirdropSig);
 
-        const programId = new PublicKey("HhV9DkMHyRBUWDh1fSr771jqNEr9qYCB1ZvbBaUpJZ7q"); // Replace with your actual program ID if different
+        const programId = new PublicKey("HhV9DkMHyRBUWDh1fSr771jqNEr9qYCB1ZvbBaUpJZ7q");
 
         // List instruction
         const priceInLamports = BigInt(LAMPORTS_PER_SOL);
@@ -25,7 +28,7 @@ async function main() {
             keys: [
                 { pubkey: payer.publicKey, isSigner: true, isWritable: true },      // Payer
                 { pubkey: itemAccount.publicKey, isSigner: true, isWritable: true }, // Item account
-                { pubkey: payer.publicKey, isSigner: false, isWritable: true },      // Seller (same as payer in this test)
+                { pubkey: payer.publicKey, isSigner: false, isWritable: true },      // Seller (same as payer)
                 { pubkey: SystemProgram.programId, isSigner: false, isWritable: false } // System program
             ],
             data: listInstructionData

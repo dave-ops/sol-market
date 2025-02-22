@@ -61,7 +61,6 @@ pub fn process_instruction(
 mod tests {
     use super::*;
     use solana_program::clock::Epoch;
-    use std::mem;
 
     #[test]
     fn test_item_size() {

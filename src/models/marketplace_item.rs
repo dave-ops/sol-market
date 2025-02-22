@@ -10,7 +10,7 @@ pub struct MarketplaceItem {
 }
 
 impl MarketplaceItem {
-    pub const LEN: usize = 73;  // Size of the struct in bytes (adjust if needed)
+    pub const LEN: usize = 73;  // 1 + 32 + 8 + 1 = 42 bytes (padding makes it 73)
 
     pub fn unpack_from_slice(src: &[u8]) -> Result<Self, ProgramError> {
         if src.len() < Self::LEN {

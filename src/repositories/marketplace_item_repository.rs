@@ -1,9 +1,11 @@
 use solana_program::{
-    account_info::{next_account_info, AccountInfo},
+    account_info::AccountInfo,
     entrypoint::ProgramResult,
     program_error::ProgramError,
     pubkey::Pubkey,
     system_instruction,
+    program::invoke,
+    rent::Rent,
 };
 
 use crate::models::marketplace_item::MarketplaceItem;
@@ -22,11 +24,15 @@ pub fn list_item(
         return Err(ProgramError::MissingRequiredSignature);
     }
 
-    solana_program::program::invoke(
+    // Calculate proper rent exemption
+    let rent = Rent::default();
+    let rent_exemption = rent.minimum_balance(MarketplaceItem::LEN);
+
+    invoke(
         &system_instruction::create_account(
             payer.key,
             item_account.key,
-            1_000_000,  // Minimum balance (adjust as needed)
+            rent_exemption,  // Use calculated rent instead of hardcoded value
             MarketplaceItem::LEN as u64,
             program_id,
         ),
@@ -62,7 +68,7 @@ pub fn buy_item(
         return Err(ProgramError::InvalidAccountData);
     }
 
-    solana_program::program::invoke(
+    invoke(
         &system_instruction::transfer(
             buyer.key,
             seller.key,
