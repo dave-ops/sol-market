@@ -48,6 +48,11 @@ solana config set --url http://127.0.0.1:8899
 solana program show --programs
 ```
 
+## fund account
+```
+solana balance HhV9DkMHyRBUWDh1fSr771jqNEr9qYCB1ZvbBaUpJZ7q --url http://127.0.0.1:8899
+```
+
 ## set program id
 ```
 cd test
