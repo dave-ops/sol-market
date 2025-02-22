@@ -28,7 +28,12 @@ cargo clean
 cargo build-sbf
 ```
 
-# deploy
+## start validator
+```
+solana-test-validator
+```
+
+## deploy
 ```bash
 solana program deploy target/deploy/solana_marketplace.so
 ```
