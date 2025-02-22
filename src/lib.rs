@@ -14,7 +14,6 @@ mod repositories {
     pub mod marketplace_item_repository;
 }
 
-use models::marketplace_item::MarketplaceItem;
 use repositories::marketplace_item_repository::{buy_item, list_item};
 
 entrypoint!(process_instruction);
@@ -60,6 +59,7 @@ pub fn process_instruction(
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::models::marketplace_item::MarketplaceItem;
     use solana_program::clock::Epoch;
 
     #[test]
