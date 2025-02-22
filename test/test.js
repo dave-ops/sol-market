@@ -18,20 +18,9 @@ async function main() {
         await connection.confirmTransaction(payerAirdropSig);
         console.log("Payer balance after airdrop:", await connection.getBalance(payer.publicKey), "lamports");
 
-        // REPLACE THIS WITH YOUR NEW PROGRAM ID FROM DEPLOYMENT
+        // REPLACE THIS WITH YOUR NEW PROGRAM ID IF IT CHANGED AFTER DEPLOYMENT
         const programId = new PublicKey("HhV9DkMHyRBUWDh1fSr771jqNEr9qYCB1ZvbBaUpJZ7q");
         console.log("Program ID:", programId.toBase58());
-
-        // Fund itemAccount with rent exemption
-        const fundTx = new Transaction().add(
-            SystemProgram.transfer({
-                fromPubkey: payer.publicKey,
-                toPubkey: itemAccount.publicKey,
-                lamports: rentExemption
-            })
-        );
-        await sendAndConfirmTransaction(connection, fundTx, [payer], { commitment: 'confirmed' });
-        console.log("Item account balance after funding:", await connection.getBalance(itemAccount.publicKey), "lamports");
 
         // List instruction
         const priceInLamports = BigInt(LAMPORTS_PER_SOL);
