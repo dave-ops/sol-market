@@ -4,20 +4,15 @@ async function main() {
     try {
         const connection = new Connection('http://127.0.0.1:8899', 'confirmed');
         
-        const payer = Keypair.generate();
-        const seller = Keypair.generate();
+        const payer = Keypair.generate(); // This will be both payer and seller
         const itemAccount = Keypair.generate();
 
         console.log("Requesting airdrops...");
         const rentExemption = await connection.getMinimumBalanceForRentExemption(73); // MarketplaceItem::LEN
         const payerAirdropSig = await connection.requestAirdrop(payer.publicKey, 2 * LAMPORTS_PER_SOL + rentExemption);
-        const sellerAirdropSig = await connection.requestAirdrop(seller.publicKey, 2 * LAMPORTS_PER_SOL);
-        await Promise.all([
-            connection.confirmTransaction(payerAirdropSig),
-            connection.confirmTransaction(sellerAirdropSig)
-        ]);
+        await connection.confirmTransaction(payerAirdropSig);
 
-        const programId = new PublicKey("HhV9DkMHyRBUWDh1fSr771jqNEr9qYCB1ZvbBaUpJZ7q");
+        const programId = new PublicKey("HhV9DkMHyRBUWDh1fSr771jqNEr9qYCB1ZvbBaUpJZ7q"); // Replace with your actual program ID if different
 
         // List instruction
         const priceInLamports = BigInt(LAMPORTS_PER_SOL);
@@ -28,9 +23,10 @@ async function main() {
         const listTx = new Transaction().add({
             programId,
             keys: [
-                { pubkey: payer.publicKey, isSigner: true, isWritable: true },
-                { pubkey: itemAccount.publicKey, isSigner: true, isWritable: true },
-                { pubkey: SystemProgram.programId, isSigner: false, isWritable: false }
+                { pubkey: payer.publicKey, isSigner: true, isWritable: true },      // Payer
+                { pubkey: itemAccount.publicKey, isSigner: true, isWritable: true }, // Item account
+                { pubkey: payer.publicKey, isSigner: false, isWritable: true },      // Seller (same as payer in this test)
+                { pubkey: SystemProgram.programId, isSigner: false, isWritable: false } // System program
             ],
             data: listInstructionData
         });
@@ -45,8 +41,8 @@ async function main() {
         const buyTx = new Transaction().add({
             programId,
             keys: [
-                { pubkey: payer.publicKey, isSigner: true, isWritable: true },
-                { pubkey: seller.publicKey, isSigner: false, isWritable: true },
+                { pubkey: payer.publicKey, isSigner: true, isWritable: true },      // Buyer (payer in this test)
+                { pubkey: payer.publicKey, isSigner: false, isWritable: true },     // Seller
                 { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
                 { pubkey: itemAccount.publicKey, isSigner: false, isWritable: true }
             ],

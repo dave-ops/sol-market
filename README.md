@@ -93,3 +93,9 @@ needs 4 accounts:
 - Seller (writable)
 - System program
 - Item account (writable)
+
+### process_instruction
+- payer (signer, writable)
+- item_account (writable)
+- seller (not explicitly used in list_item, but still required by process_instruction)
+- system_program (for account creation)
