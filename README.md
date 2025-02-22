@@ -30,11 +30,13 @@ cargo build-sbf
 
 ## start validator
 ```
-solana-test-validator
+tmux new-session -d -s solana_session 'solana-test-validator'
 ```
 
 ## deploy
 ```bash
 solana program deploy target/deploy/solana_marketplace.so
 ```
+
+kill -9 12345
 
