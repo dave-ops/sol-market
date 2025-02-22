@@ -18,9 +18,10 @@ async function main() {
     const programId = new PublicKey(process.env.SOLANA_PROGRAM_ID);
 
     // Instruction 0: List an item (price = 1 SOL = 1e9 lamports)
+    const priceInLamports = BigInt(1e9); // Convert to BigInt explicitly
     const listInstructionData = Buffer.concat([
         Buffer.from([0]), // Instruction identifier (0 = list)
-        Buffer.from(new Uint8Array(new BigUint64Array([1e9]).buffer)) // Price in lamports
+        Buffer.from(priceInLamports.toString(16).padStart(16, '0'), 'hex') // Convert BigInt to hex and pad to 8 bytes
     ]);
 
     const listTx = new Transaction().add({
