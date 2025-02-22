@@ -50,8 +50,14 @@ solana program show --programs
 
 ## set program id
 ```
+cd test
 chmod +x set_program_id.sh
-./set_program_id.sh
+sh set_program_id.sh
+cat program_id.env
+source program_id.env
+echo $SOLANA_PROGRAM_ID
+chmod +r program_id.env
+source program_id.env
 ```
 
 ## run test
