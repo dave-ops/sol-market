@@ -1,60 +1,71 @@
-const { Connection, Keypair, PublicKey, Transaction, SystemProgram, sendAndConfirmTransaction } = require('@solana/web3.js');
+const { Connection, Keypair, PublicKey, Transaction, SystemProgram, sendAndConfirmTransaction, LAMPORTS_PER_SOL, getMinimumBalanceForRentExemption } = require('@solana/web3.js');
 
 async function main() {
-    // Connect to local validator
-    const connection = new Connection('http://127.0.0.1:8899', 'confirmed');
+    try {
+        const connection = new Connection('http://127.0.0.1:8899', 'confirmed');
+        
+        const payer = Keypair.generate();
+        const seller = Keypair.generate();
+        // Don't generate itemAccount as a Keypair - program will create it
+        const itemAccount = Keypair.generate(); // Still need keypair for signing creation
 
-    // Generate keypairs
-    const payer = Keypair.generate(); // Buyer/Signer
-    const seller = Keypair.generate(); // Seller
-    const itemAccount = Keypair.generate(); // Account to store item data
+        console.log("Requesting airdrops...");
+        const rentExemption = await getMinimumBalanceForRentExemption(73); // MarketplaceItem::LEN
+        const payerAirdropSig = await connection.requestAirdrop(payer.publicKey, 2 * LAMPORTS_PER_SOL + rentExemption);
+        const sellerAirdropSig = await connection.requestAirdrop(seller.publicKey, 2 * LAMPORTS_PER_SOL);
+        await Promise.all([
+            connection.confirmTransaction(payerAirdropSig),
+            connection.confirmTransaction(sellerAirdropSig)
+        ]);
 
-    // Airdrop SOL to payer and seller for testing
-    await connection.requestAirdrop(payer.publicKey, 2e9); // 2 SOL
-    await connection.requestAirdrop(seller.publicKey, 2e9); // 2 SOL
-    await new Promise(resolve => setTimeout(resolve, 1000)); // Wait for airdrop confirmation
+        const programId = new PublicKey("HhV9DkMHyRBUWDh1fSr771jqNEr9qYCB1ZvbBaUpJZ7q");
 
-    // Use environment variable for Program ID
-    const programId = new PublicKey(process.env.SOLANA_PROGRAM_ID);
+        // List instruction
+        const priceInLamports = BigInt(LAMPORTS_PER_SOL);
+        const listInstructionData = Buffer.alloc(9);
+        listInstructionData.writeUInt8(0, 0);
+        listInstructionData.writeBigUInt64LE(priceInLamports, 1);
 
-    // Instruction 0: List an item (price = 1 SOL = 1e9 lamports)
-    const priceInLamports = BigInt(1e9); // Convert to BigInt explicitly
-    const listInstructionData = Buffer.concat([
-        Buffer.from([0]), // Instruction identifier (0 = list)
-        Buffer.from(priceInLamports.toString(16).padStart(16, '0'), 'hex') // Convert BigInt to hex and pad to 8 bytes
-    ]);
+        const listTx = new Transaction().add({
+            programId,
+            keys: [
+                { pubkey: payer.publicKey, isSigner: true, isWritable: true },
+                { pubkey: itemAccount.publicKey, isSigner: true, isWritable: true }, // Needs to be signer for create_account
+                { pubkey: SystemProgram.programId, isSigner: false, isWritable: false }
+            ],
+            data: listInstructionData
+        });
 
-    const listTx = new Transaction().add({
-        programId,
-        keys: [
-            { pubkey: payer.publicKey, isSigner: true, isWritable: true },      // Payer
-            { pubkey: itemAccount.publicKey, isSigner: false, isWritable: true }, // Item account
-            { pubkey: SystemProgram.programId, isSigner: false, isWritable: false } // System program
-        ],
-        data: listInstructionData
-    });
+        console.log("Listing item...");
+        const listSig = await sendAndConfirmTransaction(connection, listTx, [payer, itemAccount]);
+        console.log("List transaction signature:", listSig);
 
-    console.log("Listing item...");
-    await sendAndConfirmTransaction(connection, listTx, [payer]);
+        // Buy instruction
+        const buyInstructionData = Buffer.from([1]);
 
-    // Instruction 1: Buy the item
-    const buyInstructionData = Buffer.from([1]); // Instruction identifier (1 = buy)
+        const buyTx = new Transaction().add({
+            programId,
+            keys: [
+                { pubkey: payer.publicKey, isSigner: true, isWritable: true },
+                { pubkey: seller.publicKey, isSigner: false, isWritable: true },
+                { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
+                { pubkey: itemAccount.publicKey, isSigner: false, isWritable: true }
+            ],
+            data: buyInstructionData
+        });
 
-    const buyTx = new Transaction().add({
-        programId,
-        keys: [
-            { pubkey: payer.publicKey, isSigner: true, isWritable: true },      // Buyer
-            { pubkey: seller.publicKey, isSigner: false, isWritable: true },    // Seller
-            { pubkey: SystemProgram.programId, isSigner: false, isWritable: false }, // System program
-            { pubkey: itemAccount.publicKey, isSigner: false, isWritable: true } // Item account
-        ],
-        data: buyInstructionData
-    });
+        console.log("Buying item...");
+        const buySig = await sendAndConfirmTransaction(connection, buyTx, [payer]);
+        console.log("Buy transaction signature:", buySig);
 
-    console.log("Buying item...");
-    await sendAndConfirmTransaction(connection, buyTx, [payer]);
-
-    console.log("Test completed successfully!");
+        console.log("Test completed successfully!");
+    } catch (error) {
+        console.error("Error:", error);
+        if (error.logs) {
+            console.error("Transaction logs:", error.logs);
+        }
+        throw error;
+    }
 }
 
 main().catch(console.error);
