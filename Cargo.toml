@@ -3,13 +3,14 @@ name = "solana-marketplace"
 version = "0.1.0"
 edition = "2021"
 
-[dependencies]
-solana-program = "1.14"  # Use the version compatible with your Solana setup
-mongodb = "2.6"  # For off-chain persistence, adjust version as needed
-
-[dev-dependencies]
-solana-program-test = "1.14"
-
-[[bin]]
-name = "solana-marketplace"
+[lib]
+crate-type = ["cdylib", "lib"]
 path = "src/lib.rs"
+
+[dependencies]
+solana-program = "1.18.26"
+
+[profile.release]
+overflow-checks = true
+lto = "fat"
+codegen-units = 1
