@@ -10,6 +10,11 @@ use solana_program::{
     program_pack::{Pack, Sealed},
     system_instruction,
 };
+use crate::models::marketplace_item::MarketplaceItem;
+use crate::repositories::marketplace_item_repository::MarketplaceItemRepository;
+
+// Import or include your repository logic here (you might need to handle async in a different way
+// since Solana programs run in a synchronous context on-chain)
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct MarketplaceItem {
@@ -96,7 +101,7 @@ pub fn process_instruction(
                 &[payer.clone(), item_account.clone(), system_program.clone()],
             )?;
 
-            // Initialize item data
+            // Initialize item data on-chain
             let item = MarketplaceItem {
                 is_initialized: true,
                 seller: *payer.key,
@@ -106,6 +111,10 @@ pub fn process_instruction(
             item.pack_into_slice(&mut item_account.data.borrow_mut());
 
             msg!("Item listed successfully");
+
+            // Optionally log or persist off-chain (this would require an async runtime or external call)
+            // For simplicity, we'll assume this is handled off-chain via a separate service
+            // e.g., in a server or client consuming this program
         }
         1 => {
             // Buy item
@@ -131,11 +140,13 @@ pub fn process_instruction(
                 &[payer.clone(), seller.clone(), system_program.clone()],
             )?;
 
-            // Mark item as sold
+            // Mark item as sold on-chain
             item.is_active = false;
             item.pack_into_slice(&mut item_account.data.borrow_mut());
 
             msg!("Item purchased successfully");
+
+            // Optionally log or persist off-chain (handled externally)
         }
         _ => return Err(ProgramError::InvalidInstructionData),
     }
