@@ -23,6 +23,6 @@ console.log("Item account public key:", itemAccount.publicKey.toBase58());
 // Construct and output the command to run testg.js
 const payerPrivateKey = encodeToBase58(payer.secretKey);
 const itemAccountPrivateKey = encodeToBase58(itemAccount.secretKey);
-const command = `node testg.js "${payerPrivateKey}" "${itemAccountPrivateKey}"`;
+const command = `node test.js "${payerPrivateKey}" "${itemAccountPrivateKey}"`;
 console.log("\nRun this command to use these keys with testg.js:");
 console.log(command);

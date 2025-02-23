@@ -1,6 +1,7 @@
 const { Connection, Keypair, PublicKey, Transaction, SystemProgram, sendAndConfirmTransaction, LAMPORTS_PER_SOL } = require('@solana/web3.js');
+const bs58 = require('bs58');
 
-// Function to parse command-line arguments (private keys only for now)
+// Function to parse command-line arguments (private keys only, using bs58)
 function parseCommandLineArgs() {
     const args = process.argv.slice(2); // Get arguments after the script name
     if (args.length !== 2) {
@@ -12,9 +13,19 @@ function parseCommandLineArgs() {
     const [payerKey, itemKey] = args;
 
     try {
-        // Parse private keys (Base58-encoded 64-byte strings)
-        const payer = Keypair.fromSecretKey(Buffer.from(payerKey, 'base58'));
-        const itemAccount = Keypair.fromSecretKey(Buffer.from(itemKey, 'base58'));
+        // Parse private keys using bs58.decode (Base58 to Buffer)
+        const payerSecretKey = bs58.decode(payerKey);
+        if (payerSecretKey.length !== 64) {
+            throw new Error('Payer private key must be 64 bytes');
+        }
+        const payer = Keypair.fromSecretKey(payerSecretKey);
+
+        const itemAccountSecretKey = bs58.decode(itemKey);
+        if (itemAccountSecretKey.length !== 64) {
+            throw new Error('Item account private key must be 64 bytes');
+        }
+        const itemAccount = Keypair.fromSecretKey(itemAccountSecretKey);
+
         return { payer, itemAccount };
     } catch (e) {
         console.error('Error parsing private keys:', e.message);
