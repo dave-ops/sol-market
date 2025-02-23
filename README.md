@@ -67,12 +67,33 @@ chmod +r program_id.env
 source program_id.env
 ```
 
+## generate key/pairs
+```
+const { Keypair } = require('@solana/web3.js');
+
+// Generate keypairs
+const payer = Keypair.generate();
+const itemAccount = Keypair.generate();
+
+console.log("Payer private key:", Buffer.from(payer.secretKey).toString('base58'));
+console.log("Payer public key:", payer.publicKey.toBase58());
+console.log("Item account private key:", Buffer.from(itemAccount.secretKey).toString('base58'));
+console.log("Item account public key:", itemAccount.publicKey.toBase58());
+
+// Construct and output the command to run testg.js
+const payerPrivateKey = Buffer.from(payer.secretKey).toString('base58');
+const itemAccountPrivateKey = Buffer.from(itemAccount.secretKey).toString('base58');
+const command = `node testg.js "${payerPrivateKey}" "${itemAccountPrivateKey}"`;
+console.log("\nRun this command to use these keys with testg.js:");
+console.log(command);
+```
+
 ## run test
 ```
 cd test
 source program_id.env
-node testg.js 9U79odCo6xaTTGD3cNLrxq5qELyfPZhtmJGa1SGE3ZLP 22xmAif9t3aLUNU3h1u8iHV7noVeGHqSWToZ29kSmT2U
 ```
+
 
 
 ## tmux
