@@ -17,6 +17,7 @@ function encodeToBase58(buffer) {
 
 console.log("Payer private key:", encodeToBase58(payer.secretKey));
 console.log("Payer public key:", payer.publicKey.toBase58());
+
 console.log("Item account private key:", encodeToBase58(itemAccount.secretKey));
 console.log("Item account public key:", itemAccount.publicKey.toBase58());
 
@@ -24,5 +25,6 @@ console.log("Item account public key:", itemAccount.publicKey.toBase58());
 const payerPrivateKey = encodeToBase58(payer.secretKey);
 const itemAccountPrivateKey = encodeToBase58(itemAccount.secretKey);
 const command = `node test.js "${payerPrivateKey}" "${itemAccountPrivateKey}"`;
+
 console.log("\nRun this command to use these keys with testg.js:");
 console.log(command);
