@@ -64,6 +64,7 @@ pub fn buy_item(
     }
 
     let mut item = MarketplaceItem::unpack_from_slice(&item_account.data.borrow())?;
+    
     if !item.is_active || !item.is_initialized {
         return Err(ProgramError::InvalidAccountData);
     }
