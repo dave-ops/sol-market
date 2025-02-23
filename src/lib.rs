@@ -14,7 +14,7 @@ mod repositories {
     pub mod marketplace_item_repository;
 }
 
-use repositories::marketplace_item_repository::{buy_item, list_item};
+use repositories::marketplace_item_repository::{buy_item, list_item, transfer_sol};
 
 entrypoint!(process_instruction);
 
@@ -51,6 +51,22 @@ pub fn process_instruction(
             }
 
             buy_item(&[payer.clone(), seller.clone(), system_program.clone(), item_account.clone()], item_account)
+        }
+        2 => {
+            // Transfer SOL
+            if !payer.is_signer {
+                return Err(ProgramError::MissingRequiredSignature);
+            }
+
+            // Expect amount in lamports (8 bytes after instruction byte)
+            if instruction_data.len() < 9 {
+                return Err(ProgramError::InvalidInstructionData);
+            }
+            let amount = u64::from_le_bytes(instruction_data[1..9].try_into().map_err(|_| {
+                ProgramError::InvalidInstructionData
+            })?);
+
+            transfer_sol(&[payer.clone(), seller.clone(), system_program.clone()], amount)
         }
         _ => Err(ProgramError::InvalidInstructionData),
     }

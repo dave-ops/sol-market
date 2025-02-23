@@ -83,3 +83,34 @@ pub fn buy_item(
 
     Ok(())
 }
+
+pub fn transfer_sol(
+    accounts: &[AccountInfo],
+    amount: u64,
+) -> ProgramResult {
+    let account_info_iter = &mut accounts.iter();
+    let from = next_account_info(account_info_iter)?;  // Sender (payer)
+    let to = next_account_info(account_info_iter)?;    // Receiver (seller)
+    let system_program = next_account_info(account_info_iter)?;
+
+    if !from.is_signer {
+        return Err(ProgramError::MissingRequiredSignature);
+    }
+
+    // Ensure the sender has enough funds (you can add balance checking if needed)
+    let sender_balance = from.lamports();
+    if sender_balance < amount {
+        return Err(ProgramError::InsufficientFunds);
+    }
+
+    invoke(
+        &system_instruction::transfer(
+            from.key,
+            to.key,
+            amount,
+        ),
+        &[from.clone(), to.clone(), system_program.clone()],
+    )?;
+
+    Ok(())
+}
